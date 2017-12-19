@@ -1,15 +1,16 @@
 package edu.hhu.stonk.spark.datafile;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import edu.hhu.stonk.spark.exception.CantConverException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SQLContext;
-import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.api.java.function.Function;
+import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -17,8 +18,9 @@ import java.util.List;
  *
  * @author hayes, @create 2017-12-11 19:00
  **/
-public class DataFile {
+public class DataFile implements Serializable {
 
+    private static final long serialVersionUID = 6926160742414606834L;
     /**
      * 数据集文件路径
      */
@@ -65,7 +67,7 @@ public class DataFile {
 
         switch (dataFileType) {
             case CSV:
-                return csvToDataFrame(sqlContext);
+                return csvToDataFrame(context, sqlContext);
             case LIBSVM:
                 return libsvmToDataFrame(sqlContext);
             default:
@@ -79,14 +81,19 @@ public class DataFile {
                 .load(path);
     }
 
-    private Dataset<Row> csvToDataFrame(SQLContext sqlContext) throws CantConverException {
-        return sqlContext.read()
-                .format("csv")
-                .option("header", header ? "true" : "false")
-                .option("delimiter", delim)
-                .option("inferSchema", "false")
-                .schema(getStructType())
-                .load(path);
+    private Dataset<Row> csvToDataFrame(JavaSparkContext context, SQLContext sqlContext) throws CantConverException {
+        StructType schema = this.getStructType();
+
+        JavaRDD<Row> rdd = context.textFile(path)
+                .map(new LineParse(this));
+        return sqlContext.createDataFrame(rdd, schema);
+//        return sqlContext.read()
+//                .format("csv")
+//                .option("header", header ? "true" : "false")
+//                .option("delimiter", delim)
+//                .option("inferSchema", "false")
+//                .schema(getStructType())
+//                .load(path);
     }
 
     /**
@@ -95,15 +102,17 @@ public class DataFile {
      * @return
      * @throws CantConverException
      */
+    @JsonIgnore
     public StructType getStructType() throws CantConverException {
         //按照 Index 排序
-        fieldInfos.sort((FieldInfo f1, FieldInfo f2) -> f1.getIndex() > f2.getIndex() ? 1 : -1);
+        fieldInfos.sort((FieldInfo f1, FieldInfo f2) -> f1.getIndex() > f2.getIndex() ? -1 : 1);
+
         StructField[] fields = new StructField[fieldInfos.size()];
         for (int i = 0; i < fieldInfos.size(); i++) {
             fields[i] = fieldInfos.get(i).convertToStructField();
         }
 
-        return DataTypes.createStructType(fields);
+        return new StructType(fields);
     }
 
 
@@ -153,5 +162,46 @@ public class DataFile {
 
     public void setDataFileType(DataFileType dataFileType) {
         this.dataFileType = dataFileType;
+    }
+}
+
+
+/**
+ * 行->Row
+ */
+class LineParse implements Function<String, Row> {
+    private static final long serialVersionUID = -1481954080127428634L;
+
+    private DataFile dataFile;
+
+    public LineParse(DataFile dataFile) {
+        this.dataFile = dataFile;
+    }
+
+    @Override
+    public Row call(String line) throws Exception {
+        String[] strArr;
+        if (StringUtils.isEmpty(dataFile.getDelim())) {
+            strArr = new String[]{line};
+        } else {
+            strArr = line.split(dataFile.getDelim());
+        }
+
+        List<FieldInfo> fieldInfos = dataFile.getFieldInfos();
+        Object[] objs = new Object[fieldInfos.size()];
+        for (int i = 0; i < fieldInfos.size(); i++) {
+            FieldInfo fieldInfo = fieldInfos.get(i);
+            //单列
+            if (fieldInfo.getIndex() != -1) {
+                objs[i] = fieldInfo.call(strArr[i]);
+                //多列
+            } else {
+                int tmpSize = fieldInfo.getEndIndex() - fieldInfo.getStartIndex() + 1;
+                String[] tmp = new String[tmpSize];
+                System.arraycopy(strArr, fieldInfo.getStartIndex(), tmp, 0, tmpSize);
+                objs[i] = fieldInfo.call(tmp);
+            }
+        }
+        return RowFactory.create(objs);
     }
 }

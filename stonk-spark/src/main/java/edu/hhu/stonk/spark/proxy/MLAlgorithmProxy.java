@@ -35,7 +35,7 @@ public class MLAlgorithmProxy {
             String setterMethodName = param.getKey().substring(0, 1).toUpperCase()
                     + param.getKey().substring(1);
             Method method = algoClazz.getMethod("set" + setterMethodName,
-                    paramDesc.getJavaTypeClass());
+                    paramDesc.javaTypeClass());
             method.invoke(algo, paramDesc.valueOf(param.getValue()));
         }
     }

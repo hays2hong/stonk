@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
  **/
 public class EstimatorProxy extends MLAlgorithmProxy {
 
-    EstimatorProxy(TaskMLalgorithm mlAlgo) throws Exception {
+    public EstimatorProxy(TaskMLalgorithm mlAlgo) throws Exception {
         super(mlAlgo);
     }
 

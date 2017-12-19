@@ -1,0 +1,21 @@
+{
+  "tokenizer": {
+    "name": "tokenizer",
+    "showName": "分词",
+    "className": "org.apache.spark.ml.feature.Tokenizer",
+    "componentsType": "TRANSFORMER",
+    "usageType": "CLUSTERING",
+    "parameterDescs": {
+      "outputCol": {
+        "name": "outputCol",
+        "showName": "输入",
+        "valueType": "STRING"
+      },
+      "inputCol": {
+        "name": "inputCol",
+        "showName": "输入",
+        "valueType": "STRING"
+      }
+    }
+  }
+}

@@ -10,8 +10,11 @@ import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 
 import java.io.Closeable;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class HDFSClient implements Closeable {
@@ -23,9 +26,9 @@ public class HDFSClient implements Closeable {
      */
     public HDFSClient(String HdfsUri, String user) throws Exception {
         Configuration configuration = new Configuration();
-//        HDFS 的地址需要修改成自己的地址
+        //HDFS 的地址需要修改成自己的地址
         configuration.set("fs.default.name", HdfsUri);
-//        设定文件系统的URI, 配置, 以及用户
+        // 设定文件系统的URI, 配置, 以及用户
         fs = FileSystem.get(new URI(HdfsUri), configuration, user);
     }
 
@@ -35,9 +38,9 @@ public class HDFSClient implements Closeable {
      */
     public HDFSClient(String HdfsUri) throws Exception {
         Configuration configuration = new Configuration();
-//        HDFS 的地址需要修改成自己的地址
+        //HDFS 的地址需要修改成自己的地址
         configuration.set("fs.default.name", HdfsUri);
-//        设定文件系统的URI, 配置, 以及用户
+        //设定文件系统的URI, 配置, 以及用户
         fs = FileSystem.get(new URI(HdfsUri), configuration, "root");
     }
 
@@ -53,28 +56,30 @@ public class HDFSClient implements Closeable {
         if (fs.exists(new Path(path))) {
             res = fs.delete(new Path(path), is);
         }
-        System.out.println("HDFS文件已删除");
         return res;
     }
 
 
-    /***
+    /**
      * 列出该路径下的所有文件
      * @param path
+     * @param recursive 是否递归
+     * @return
      * @throws IOException
      */
-    public void list(String path) throws IOException {
-        RemoteIterator<LocatedFileStatus> files = fs.listFiles(new Path(path), true);
+    public List<String> list(String path, boolean recursive) throws IOException {
+        List<String> sons = new ArrayList<>();
+        RemoteIterator<LocatedFileStatus> files = fs.listFiles(new Path(path), recursive);
         while (files.hasNext()) {
             LocatedFileStatus file = files.next();
-            if (file.isFile()) {
-                System.out.println(file.getPath());
-            } else if (file.isDirectory()) {
-                list(file.getPath().toString());
-            }
+            sons.add(file.getPath().toString());
 
         }
-        fs.close();
+        return sons;
+    }
+
+    public List<String> list(String path) throws IOException {
+        return list(path, false);
     }
 
     /***
@@ -89,16 +94,8 @@ public class HDFSClient implements Closeable {
             fs.copyFromLocalFile(false, true, new Path(src), new Path(dst));
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("文件上传到HDFS出错");
             return false;
-        } finally {
-            try {
-                fs.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
-        System.out.println("上传文件成功");
         return true;
     }
 
@@ -115,25 +112,31 @@ public class HDFSClient implements Closeable {
             fs.copyToLocalFile(false, new Path(src), dstPath);
         } catch (IOException ie) {
             ie.printStackTrace();
-            System.out.println("文件下载出错");
             return false;
-        } finally {
-            try {
-                fs.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
-        System.out.println("上传下载成功");
         return true;
     }
 
-    public void getNodeInfo() throws IOException {
-        DistributedFileSystem hdfs = (DistributedFileSystem) fs;
-        DatanodeInfo[] datanodeInfos = hdfs.getDataNodeStats();
-        for (DatanodeInfo info : datanodeInfos) {
-            System.out.println(info.getDatanodeReport());
+    public DataInputStream getFileInputStream(String src) throws IOException {
+        return fs.open(new Path(src));
+    }
+
+    public boolean mkdir(String path) {
+        try {
+            return fs.mkdirs(new Path(path));
+        } catch (IOException ie) {
+            ie.printStackTrace();
+            return false;
         }
+    }
+
+    public boolean exists(String path) throws IOException {
+        return fs.exists(new Path(path));
+    }
+
+    public DatanodeInfo[] getNodeInfo() throws IOException {
+        DistributedFileSystem hdfs = (DistributedFileSystem) fs;
+        return hdfs.getDataNodeStats();
     }
 
     @Override

@@ -22,19 +22,19 @@ public class ParameterDesc {
      */
     public ParameterValueType valueType;
 
-    public Class getJavaTypeClass() {
+    public Class javaTypeClass() {
         switch (valueType) {
             case BOOLEAN: {
-                return Boolean.class;
+                return boolean.class;
             }
             case STRING: {
                 return String.class;
             }
             case INT: {
-                return Integer.class;
+                return int.class;
             }
             case DOUBLE: {
-                return Double.class;
+                return double.class;
             }
         }
         return String.class;

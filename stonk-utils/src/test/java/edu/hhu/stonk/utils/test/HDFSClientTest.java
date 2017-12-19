@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 public class HDFSClientTest {
     static HDFSClient client;
@@ -23,14 +24,37 @@ public class HDFSClientTest {
     }
 
     @Test
+    public void testMkdir() {
+        System.out.print("mkdirTest:");
+        System.out.println(client.mkdir("\\stonk\\spark\\"));
+
+    }
+
+    @Test
+    public void testExists() throws IOException {
+        System.out.print("exists:");
+        System.out.println(client.exists("\\stonk\\spark\\"));
+
+    }
+
+    @Test
     public void testList() {
-        System.out.println("testList");
+        System.out.println("listTest:");
         try {
-            client.list("\\");
+            List<String> paths = client.list("\\");
+            for (String path : paths) {
+                System.out.println(path);
+            }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
+    }
+
+    @Test
+    public void test() {
+        client.uploadFromLocal("D://test/ngram/testtask.json", "hdfs://10.196.83.90:9000/stonk/spark/1001/test/testtask.json");
+        // client.uploadFromLocal("D://test/ngram/testdata.csv", "hdfs://10.196.83.90:9000/stonk/spark/1001/test/testdata.csv");
     }
 }

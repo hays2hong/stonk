@@ -1,0 +1,30 @@
+{
+  "name": "test",
+  "uid": "1001",
+  "dataFile": {
+    "path": "hdfs://10.196.83.90:9000/stonk/spark/1001/test/testfile.csv",
+    "name": "testfile",
+    "delim": ",",
+    "header": false,
+    "dataFileType": "CSV",
+    "fieldInfos": [
+      {
+        "dataType": "string",
+        "name": "sentence",
+        "nullable": false,
+        "index": 0
+      }
+    ],
+    "structType": {
+      "empty": false,
+      "traversableAgain": true
+    }
+  },
+  "mlAlgorithm": {
+    "name": "tokenizer",
+    "parameters": {
+      "outputCol": "words",
+      "inputCol": "sentence"
+    }
+  }
+}

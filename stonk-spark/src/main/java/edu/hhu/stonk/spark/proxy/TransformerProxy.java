@@ -13,12 +13,12 @@ import java.lang.reflect.Method;
  **/
 public class TransformerProxy extends MLAlgorithmProxy {
 
-    TransformerProxy(TaskMLalgorithm mlAlgo) throws Exception {
+    public TransformerProxy(TaskMLalgorithm mlAlgo) throws Exception {
         super(mlAlgo);
     }
 
     public Dataset<Row> transform(Dataset<Row> dataset) throws Exception {
-        Method method = algoClazz.getMethod("transform");
+        Method method = algoClazz.getMethod("transform", Dataset.class);
         return (Dataset<Row>) method.invoke(algo, dataset);
     }
 }
