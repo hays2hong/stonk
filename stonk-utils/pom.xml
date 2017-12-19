@@ -14,11 +14,10 @@
 
     <dependencies>
 
-        <!--<dependency>-->
-        <!--<groupId>org.apache.hbase</groupId>-->
-        <!--<artifactId>hbase-client</artifactId>-->
-        <!--<type>pom</type>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
