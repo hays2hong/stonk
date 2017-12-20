@@ -17,6 +17,11 @@ public class DataFile implements Serializable {
     private String path;
 
     /**
+     * 所有者
+     */
+    private String uname;
+
+    /**
      * 数据集文件名
      */
     private String name;
@@ -87,6 +92,14 @@ public class DataFile implements Serializable {
 
     public void setDataFileType(DataFileType dataFileType) {
         this.dataFileType = dataFileType;
+    }
+
+    public String getUname() {
+        return uname;
+    }
+
+    public void setUname(String uname) {
+        this.uname = uname;
     }
 }
 

@@ -1,6 +1,6 @@
 package edu.hhu.stonk.spark.proxy;
 
-import edu.hhu.stonk.spark.task.TaskMLalgorithm;
+import edu.hhu.stonk.dao.task.SparkTaskAlgorithm;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
  **/
 public class TransformerProxy extends MLAlgorithmProxy {
 
-    public TransformerProxy(TaskMLalgorithm mlAlgo) throws Exception {
+    public TransformerProxy(SparkTaskAlgorithm mlAlgo) throws Exception {
         super(mlAlgo);
     }
 

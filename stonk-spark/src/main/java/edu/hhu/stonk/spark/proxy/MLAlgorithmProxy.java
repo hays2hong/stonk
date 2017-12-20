@@ -1,9 +1,9 @@
 package edu.hhu.stonk.spark.proxy;
 
+import edu.hhu.stonk.dao.task.SparkTaskAlgorithm;
 import edu.hhu.stonk.spark.mllib.MLAlgorithmDesc;
 import edu.hhu.stonk.spark.mllib.MLAlgorithmLoader;
 import edu.hhu.stonk.spark.mllib.ParameterDesc;
-import edu.hhu.stonk.spark.task.TaskMLalgorithm;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -24,7 +24,7 @@ public class MLAlgorithmProxy {
 
     protected MLAlgorithmDesc desc;
 
-    MLAlgorithmProxy(TaskMLalgorithm mlAlgo) throws Exception {
+    MLAlgorithmProxy(SparkTaskAlgorithm mlAlgo) throws Exception {
         desc = MLAlgorithmLoader.getMLAlgorithmDesc(mlAlgo.getName());
         algoClazz = Class.forName(desc.getClassName());
         algo = algoClazz.newInstance();

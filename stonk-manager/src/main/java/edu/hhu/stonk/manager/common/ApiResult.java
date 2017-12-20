@@ -26,10 +26,25 @@ public class ApiResult<T> {
         return rst;
     }
 
+    public static <T> ApiResult buildSucessWithData(T data) {
+        ApiResult rst = new ApiResult();
+        rst.setSucess(true);
+        rst.setMsg("SUCESS");
+        rst.setData(data);
+        return rst;
+    }
+
     public static ApiResult buildSucess(String msg) {
         ApiResult rst = new ApiResult();
         rst.setSucess(true);
         rst.setMsg(msg);
+        return rst;
+    }
+
+    public static ApiResult buildSucess() {
+        ApiResult rst = new ApiResult();
+        rst.setSucess(true);
+        rst.setMsg("SUCESS");
         return rst;
     }
 

@@ -90,8 +90,19 @@ public class HDFSClient implements Closeable {
      * @return
      */
     public boolean uploadFromLocal(String src, String dst) {
+        return uploadFromLocal(src, dst, false);
+    }
+
+    /***
+     * 文件从本地上传到
+     * HDFS
+     * @param src
+     * @param dst
+     * @return
+     */
+    public boolean uploadFromLocal(String src, String dst, boolean delSrc) {
         try {
-            fs.copyFromLocalFile(false, true, new Path(src), new Path(dst));
+            fs.copyFromLocalFile(delSrc, true, new Path(src), new Path(dst));
         } catch (IOException e) {
             e.printStackTrace();
             return false;

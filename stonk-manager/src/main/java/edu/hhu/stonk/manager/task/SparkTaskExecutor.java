@@ -1,8 +1,7 @@
 package edu.hhu.stonk.manager.task;
 
-import edu.hhu.stonk.dao.datafile.DataFile;
+import edu.hhu.stonk.dao.task.StonkTaskInfo;
 import edu.hhu.stonk.manager.conf.SystemConfig;
-import edu.hhu.stonk.spark.task.SparkTaskInfo;
 import edu.hhu.stonk.utils.RandomUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,38 +31,24 @@ public class SparkTaskExecutor {
      * @return
      * @throws IOException
      */
-    public String execute(StonkTaskInfo taskInfo) throws IOException {
-        SparkTaskInfo sparkTaskInfo = buildSparkTaskInfo(taskInfo);
+    public void execute(StonkTaskInfo taskInfo) throws IOException {
+        fillStonkTaskInfo(taskInfo);
 
         ProcessBuilder pb = new ProcessBuilder();
-        pb.command(buildCommand(sparkTaskInfo));
+        pb.command(buildCommand(taskInfo));
         Process p = pb.start();
-
-        return sparkTaskInfo.getName();
     }
 
-    private SparkTaskInfo buildSparkTaskInfo(StonkTaskInfo taskInfo) {
+    private void fillStonkTaskInfo(StonkTaskInfo taskInfo) {
         String taskName = new StringBuilder().append(TASK_PREFIX)
                 .append("-").append(taskInfo.getUname())
                 .append("-").append(RandomUtil.getRandomString(8))
                 .toString();
-
-        SparkTaskInfo sparkTaskInfo = new SparkTaskInfo();
-        sparkTaskInfo.setName(taskName);
-        sparkTaskInfo.setMlAlgorithm(taskInfo.getMlAlgorithm());
-        sparkTaskInfo.setUname(taskInfo.getUname());
-        sparkTaskInfo.setSparkExecutorNum(taskInfo.getSparkExecutorNum());
-        sparkTaskInfo.setDataFile(getDataFileDesc(taskInfo.getUname(), taskInfo.getDataFile()));
-
-        return sparkTaskInfo;
+        taskInfo.setName(taskName);
+        taskInfo.setTimeStamp(System.currentTimeMillis());
     }
 
-    private DataFile getDataFileDesc(String uname, String dataFile) {
-
-        return null;
-    }
-
-    public List<String> buildCommand(SparkTaskInfo taskInfo) {
+    public List<String> buildCommand(StonkTaskInfo taskInfo) {
         List<String> command = new ArrayList<>();
         command.add("bin/spark-submit");
         command.add("--deploy-mode");
@@ -81,10 +66,11 @@ public class SparkTaskExecutor {
         command.add("--conf");
         command.add("spark.kubernetes.executor.docker.image=" + systemConfig.getK8sSparkExecutorDockerImage());
         command.add("--conf");
+        command.add("spark.kubernetes.authenticate.driver.serviceAccountName=" + systemConfig.getK8sSparkServiceAccountName());
         command.add(systemConfig.getTaskJarPath());
         command.add(systemConfig.getHdfsMaster());
-        //TODO：task file path
-        command.add(systemConfig.getHdfsMaster());
+        command.add(taskInfo.getUname());
+        command.add(taskInfo.getName());
 
         return command;
     }

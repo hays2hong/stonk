@@ -32,7 +32,6 @@ public class SystemConfig {
 
     private String taskJarPath;
 
-    private String hbaseMaster;
 
     @PostConstruct
     public void load() throws IOException {
@@ -46,70 +45,35 @@ public class SystemConfig {
         k8sSparkExecutorDockerImage = pro.getProperty("k8s.spark.executor.docker.image");
         hdfsMaster = pro.getProperty("hdfs.master");
         taskJarPath = pro.getProperty("task.jar.path");
-        hbaseMaster = pro.getProperty("hbase.master");
     }
+
 
     public String getK8sMaster() {
         return k8sMaster;
-    }
-
-    public void setK8sMaster(String k8sMaster) {
-        this.k8sMaster = k8sMaster;
     }
 
     public String getK8sSparkNamespace() {
         return k8sSparkNamespace;
     }
 
-    public void setK8sSparkNamespace(String k8sSparkNamespace) {
-        this.k8sSparkNamespace = k8sSparkNamespace;
-    }
-
     public String getK8sSparkServiceAccountName() {
         return k8sSparkServiceAccountName;
-    }
-
-    public void setK8sSparkServiceAccountName(String k8sSparkServiceAccountName) {
-        this.k8sSparkServiceAccountName = k8sSparkServiceAccountName;
     }
 
     public String getK8sSparkDriverDockerImage() {
         return k8sSparkDriverDockerImage;
     }
 
-    public void setK8sSparkDriverDockerImage(String k8sSparkDriverDockerImage) {
-        this.k8sSparkDriverDockerImage = k8sSparkDriverDockerImage;
-    }
-
     public String getK8sSparkExecutorDockerImage() {
         return k8sSparkExecutorDockerImage;
-    }
-
-    public void setK8sSparkExecutorDockerImage(String k8sSparkExecutorDockerImage) {
-        this.k8sSparkExecutorDockerImage = k8sSparkExecutorDockerImage;
     }
 
     public String getHdfsMaster() {
         return hdfsMaster;
     }
 
-    public void setHdfsMaster(String hdfsMaster) {
-        this.hdfsMaster = hdfsMaster;
-    }
-
     public String getTaskJarPath() {
         return taskJarPath;
     }
 
-    public void setTaskJarPath(String taskJarPath) {
-        this.taskJarPath = taskJarPath;
-    }
-
-    public String getHbaseMaster() {
-        return hbaseMaster;
-    }
-
-    public void setHbaseMaster(String hbaseMaster) {
-        this.hbaseMaster = hbaseMaster;
-    }
 }

@@ -1,7 +1,9 @@
 package edu.hhu.stonk.spark.datafile;
 
 import edu.hhu.stonk.dao.datafile.DataFile;
+import edu.hhu.stonk.dao.datafile.DataFileMapper;
 import edu.hhu.stonk.dao.datafile.FieldInfo;
+import edu.hhu.stonk.dao.task.StonkTaskInfo;
 import edu.hhu.stonk.spark.exception.CantConverException;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -21,6 +23,12 @@ import java.util.List;
  **/
 public class SparkDataFileConverter {
 
+    public static Dataset<Row> extractDataFrame(StonkTaskInfo taskInfo, JavaSparkContext context) throws Exception {
+        DataFileMapper mapper = new DataFileMapper();
+        DataFile dataFile = mapper.get(taskInfo.getUname(), taskInfo.getDataFileName());
+        return convertToDataFrame(dataFile, context);
+    }
+
     /**
      * 将数据集文件转换为DataFrame
      *
@@ -28,7 +36,7 @@ public class SparkDataFileConverter {
      * @return
      * @throws CantConverException
      */
-    public Dataset<Row> convertToDataFrame(DataFile dataFile, JavaSparkContext context) throws CantConverException {
+    public static Dataset<Row> convertToDataFrame(DataFile dataFile, JavaSparkContext context) throws CantConverException {
         SparkSession sparkSession = SparkSession.builder()
                 .sparkContext(context.sc())
                 .getOrCreate();
@@ -45,13 +53,13 @@ public class SparkDataFileConverter {
         }
     }
 
-    private Dataset<Row> libsvmToDataFrame(DataFile dataFile, SQLContext sqlContext) {
+    private static Dataset<Row> libsvmToDataFrame(DataFile dataFile, SQLContext sqlContext) {
         return sqlContext.read()
                 .format("libsvm")
                 .load(dataFile.getPath());
     }
 
-    private Dataset<Row> csvToDataFrame(DataFile dataFile, JavaSparkContext context, SQLContext sqlContext) throws CantConverException {
+    private static Dataset<Row> csvToDataFrame(DataFile dataFile, JavaSparkContext context, SQLContext sqlContext) throws CantConverException {
         StructType schema = getStructType(dataFile);
 
         JavaRDD<Row> rdd = context.textFile(dataFile.getPath())
@@ -72,7 +80,7 @@ public class SparkDataFileConverter {
      * @return
      * @throws CantConverException
      */
-    public StructType getStructType(DataFile dataFile) throws CantConverException {
+    public static StructType getStructType(DataFile dataFile) throws CantConverException {
         List<FieldInfo> fieldInfos = dataFile.getFieldInfos();
         //按照 Index 排序
         fieldInfos.sort((FieldInfo f1, FieldInfo f2) -> f1.getIndex() > f2.getIndex() ? -1 : 1);
@@ -92,7 +100,7 @@ public class SparkDataFileConverter {
      * @return
      * @throws CantConverException
      */
-    public StructField convertToStructField(FieldInfo info) throws CantConverException {
+    public static StructField convertToStructField(FieldInfo info) throws CantConverException {
         if (info.getIndex() != -1) {
             return DataTypes.createStructField(info.getName(), sparkDataType(info.getDataType()), info.isNullable());
         } else {
@@ -116,7 +124,7 @@ public class SparkDataFileConverter {
      *
      * @return
      */
-    public DataType sparkDataType(String dataType) throws CantConverException {
+    public static DataType sparkDataType(String dataType) throws CantConverException {
         switch (dataType) {
             case FieldInfo.DOUBLE_DATATYPE: {
                 return DataTypes.DoubleType;
@@ -144,4 +152,6 @@ public class SparkDataFileConverter {
             }
         }
     }
+
+
 }

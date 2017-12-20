@@ -36,7 +36,7 @@ public class SparkTaskInfo implements Serializable {
     /**
      * 算法信息
      */
-    private SparkTaskAlgorithm mlAlgorithm;
+    private SparkTaskAlgorithm algorithm;
 
     public String getName() {
         return name;
@@ -55,12 +55,12 @@ public class SparkTaskInfo implements Serializable {
         this.dataFile = dataFile;
     }
 
-    public SparkTaskAlgorithm getMlAlgorithm() {
-        return mlAlgorithm;
+    public SparkTaskAlgorithm getAlgorithm() {
+        return algorithm;
     }
 
-    public void setMlAlgorithm(SparkTaskAlgorithm mlAlgorithm) {
-        this.mlAlgorithm = mlAlgorithm;
+    public void setAlgorithm(SparkTaskAlgorithm algorithm) {
+        this.algorithm = algorithm;
     }
 
     public int getSparkExecutorNum() {

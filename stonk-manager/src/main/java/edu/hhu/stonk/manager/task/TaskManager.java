@@ -1,5 +1,6 @@
 package edu.hhu.stonk.manager.task;
 
+import edu.hhu.stonk.dao.task.StonkTaskInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,9 +17,8 @@ public class TaskManager {
     @Autowired
     SparkTaskExecutor sparkTaskExecutor;
 
-    public String execute(StonkTaskInfo taskInfo) throws IOException {
-        String taskName = sparkTaskExecutor.execute(taskInfo);
-        return taskName;
+    public void execute(StonkTaskInfo taskInfo) throws IOException {
+        sparkTaskExecutor.execute(taskInfo);
     }
 
 }

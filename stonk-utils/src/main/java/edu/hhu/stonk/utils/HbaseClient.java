@@ -82,16 +82,16 @@ public class HbaseClient implements Closeable {
      * @param tableName
      * @param rowKey
      * @param familyName
-     * @param columnName
+     * @param qualifierName
      * @param value
      * @throws Exception
      */
-    public void putData(String tableName, String rowKey, String familyName, String columnName, String value)
+    public void putData(String tableName, String rowKey, String familyName, String qualifierName, String value)
             throws Exception {
         HTable htable = getHtable(tableName);
 
         Put put = new Put(Bytes.toBytes(rowKey));
-        put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes(columnName), Bytes.toBytes(value));
+        put.addColumn(Bytes.toBytes(familyName), Bytes.toBytes(qualifierName), Bytes.toBytes(value));
         htable.put(put);
     }
 
@@ -117,16 +117,16 @@ public class HbaseClient implements Closeable {
      * @param tableName
      * @param rowKey
      * @param familyName
-     * @param columnName
+     * @param qualifierName
      * @return
      * @throws Exception
      */
-    public String getValue(String tableName, String rowKey, String familyName, String columnName) throws Exception {
+    public String getValue(String tableName, String rowKey, String familyName, String qualifierName) throws Exception {
         HTable htable = getHtable(tableName);
 
         Get get = new Get(Bytes.toBytes(rowKey));
         Result result = htable.get(get);
-        Cell cell = result.getColumnLatestCell(Bytes.toBytes(familyName), Bytes.toBytes(columnName));
+        Cell cell = result.getColumnLatestCell(Bytes.toBytes(familyName), Bytes.toBytes(qualifierName));
         if (cell == null) {
             return null;
         }
@@ -139,18 +139,18 @@ public class HbaseClient implements Closeable {
      * @param tableName
      * @param rowPrefix
      * @param familyName
-     * @param columnName
+     * @param qualifierName
      * @return
      * @throws Exception
      */
-    public List<String> getValueByRowPrefix(String tableName, String rowPrefix, String familyName, String columnName) throws Exception {
+    public List<String> getValueByRowPrefix(String tableName, String rowPrefix, String familyName, String qualifierName) throws Exception {
         HTable htable = getHtable(tableName);
         List<String> values = new ArrayList<>();
 
         Scan scan = new Scan();
         scan.setFilter(new PrefixFilter(Bytes.toBytes(rowPrefix)));
         htable.getScanner(scan).forEach((result) -> {
-            Cell cell = result.getColumnLatestCell(Bytes.toBytes(familyName), Bytes.toBytes(columnName));
+            Cell cell = result.getColumnLatestCell(Bytes.toBytes(familyName), Bytes.toBytes(qualifierName));
             if (cell != null) {
                 values.add(Bytes.toString(CellUtil.cloneValue(cell)));
             }
@@ -165,14 +165,14 @@ public class HbaseClient implements Closeable {
      * @param tableName
      * @param rowKey
      * @param falilyName
-     * @param columnName
+     * @param qualifierName
      * @throws Exception
      */
-    public void deleteColumn(String tableName, String rowKey, String falilyName, String columnName) throws Exception {
+    public void deleteColumn(String tableName, String rowKey, String falilyName, String qualifierName) throws Exception {
         HTable htable = getHtable(tableName);
 
         Delete delete = new Delete(Bytes.toBytes(rowKey));
-        delete.addColumn(Bytes.toBytes(falilyName), Bytes.toBytes(columnName));
+        delete.addColumn(Bytes.toBytes(falilyName), Bytes.toBytes(qualifierName));
         htable.delete(delete);
     }
 

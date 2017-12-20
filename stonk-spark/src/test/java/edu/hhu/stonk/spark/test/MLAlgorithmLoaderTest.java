@@ -16,7 +16,7 @@ import java.util.Map;
 public class MLAlgorithmLoaderTest {
 
     @Test
-    public void load() {
+    public void load() throws IOException {
         MLAlgorithmDesc desc = MLAlgorithmLoader.getMLAlgorithmDesc("tokenizer");
         System.out.println(desc.getName());
     }

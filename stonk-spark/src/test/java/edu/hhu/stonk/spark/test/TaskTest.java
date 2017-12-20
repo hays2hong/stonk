@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.hhu.stonk.dao.datafile.DataFile;
 import edu.hhu.stonk.dao.datafile.DataFileType;
 import edu.hhu.stonk.dao.datafile.FieldInfo;
+import edu.hhu.stonk.dao.task.SparkTaskAlgorithm;
 import edu.hhu.stonk.spark.task.SparkTaskInfo;
-import edu.hhu.stonk.spark.task.TaskMLalgorithm;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,14 +22,14 @@ public class TaskTest {
     public static void main(String[] args) throws IOException {
         SparkTaskInfo sparkTaskInfo = new SparkTaskInfo();
         sparkTaskInfo.setName("test");
-        sparkTaskInfo.setUid("1001");
-        TaskMLalgorithm algo = new TaskMLalgorithm();
+        sparkTaskInfo.setUname("1001");
+        SparkTaskAlgorithm algo = new SparkTaskAlgorithm();
         algo.setName("tokenizer");
         Map<String, String> params = new HashMap<>();
         params.put("inputCol", "sentence");
         params.put("outputCol", "words");
         algo.setParameters(params);
-        sparkTaskInfo.setMlAlgorithm(algo);
+        sparkTaskInfo.setAlgorithm(algo);
         DataFile data = new DataFile();
         data.setDataFileType(DataFileType.CSV);
         data.setHeader(false);

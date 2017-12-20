@@ -1,13 +1,16 @@
 package edu.hhu.stonk.manager.api;
 
+import edu.hhu.stonk.dao.task.StonkTaskInfo;
+import edu.hhu.stonk.dao.task.StonkTaskMapper;
+import edu.hhu.stonk.dao.task.StonkTaskType;
 import edu.hhu.stonk.manager.common.ApiResult;
-import edu.hhu.stonk.manager.task.StonkTaskInfo;
-import edu.hhu.stonk.manager.task.StonkTaskType;
 import edu.hhu.stonk.manager.task.TaskManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.List;
 
@@ -23,16 +26,19 @@ public class Task {
     @Autowired
     private TaskManager taskManager;
 
+    private StonkTaskMapper taskMapper;
+
+
     //TODO：提交任务后，任务的管理
     @RequestMapping(value = "/submit", method = RequestMethod.PUT)
     @ResponseBody
     public ApiResult<String> submit(@RequestBody StonkTaskInfo taskInfo) {
         if (taskInfo.getTaskType() == StonkTaskType.SPARK_TASK_TYPE) {
             try {
-                String taskName = taskManager.execute(taskInfo);
-                return ApiResult.buildSucessWithData("sucess", taskName);
-            } catch (IOException e) {
-                e.printStackTrace();
+                taskManager.execute(taskInfo);
+                taskMapper.put(taskInfo);
+                return ApiResult.buildSucessWithData(taskInfo);
+            } catch (Exception e) {
                 return ApiResult.buildFail(e.getMessage());
             }
         }
@@ -40,18 +46,34 @@ public class Task {
         return ApiResult.buildFail("不支持的任务类型");
     }
 
-    //TODO：从数据库取该用户的所有任务
     @RequestMapping(value = "/{uname}/tasks", method = RequestMethod.GET)
     @ResponseBody
     public ApiResult<List<StonkTaskInfo>> tasks(@PathVariable String uname) {
-        return null;
+        try {
+            return ApiResult.buildSucessWithData(taskMapper.get(uname));
+        } catch (Exception e) {
+            return ApiResult.buildFail(e.getMessage());
+        }
     }
 
-    //TODO：从数据库取该用户的所有任务
     @RequestMapping(value = "/{uname}/tasks/{taskName}", method = RequestMethod.GET)
     @ResponseBody
     public ApiResult<List<StonkTaskInfo>> task(@PathVariable String uname, @PathVariable String taskName) {
-        return null;
+        try {
+            return ApiResult.buildSucessWithData(taskMapper.get(uname, taskName));
+        } catch (Exception e) {
+            return ApiResult.buildFail(e.getMessage());
+        }
+    }
+
+    @PostConstruct
+    public void init() throws IOException {
+        taskMapper = new StonkTaskMapper();
+    }
+
+    @PreDestroy
+    public void destroy() throws IOException {
+        taskMapper.close();
     }
 
 

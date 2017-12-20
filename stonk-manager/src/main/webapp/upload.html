@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DataFile Upload</title>
+</head>
+<body>
+
+<form action="${pageContext.request.contextPath }/upload" method="post" enctype="multipart/form-data">
+    <h2>文件上传</h2>
+    用户名:<input type="text" name="uname"/><br/>
+    文件:<input type="file" name="file"/><br/><br/>
+    <input type="submit" value="上传"/>
+</form>
+
+</body>
+</html>
