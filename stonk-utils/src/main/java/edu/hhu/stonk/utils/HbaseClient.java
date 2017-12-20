@@ -1,15 +1,15 @@
 package edu.hhu.stonk.utils;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.HColumnDescriptor;
-import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.filter.PrefixFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,14 +29,16 @@ public class HbaseClient implements Closeable {
     private Map<String, HTable> htables = new ConcurrentHashMap<>();
 
     //TODO: 连接池和用户相关设置
-    public HbaseClient(String hbaseMaster, String zkMaster, String zkPort) throws IOException {
+    public HbaseClient(String zkMaster, String zkClientPort, String rootDir, String retryNum) throws IOException {
         hbaseConf = HBaseConfiguration.create();
-        hbaseConf.set("hbase.zookeeper.property.clientPort", zkPort);
+        hbaseConf.set("hbase.zookeeper.property.clientPort", zkClientPort);
         hbaseConf.set("hbase.zookeeper.quorum", zkMaster);
-        hbaseConf.set("hbase.master", hbaseMaster);
+        hbaseConf.set("hbase.rootdir", rootDir);
+        hbaseConf.set("hbase.client.retries.number", retryNum);
         connection = ConnectionFactory.createConnection(hbaseConf);
         admin = connection.getAdmin();
     }
+
 
     /**
      * 创建表
@@ -119,13 +121,41 @@ public class HbaseClient implements Closeable {
      * @return
      * @throws Exception
      */
-    public Result getResult(String tableName, String rowKey, String familyName, String columnName) throws Exception {
+    public String getValue(String tableName, String rowKey, String familyName, String columnName) throws Exception {
         HTable htable = getHtable(tableName);
 
         Get get = new Get(Bytes.toBytes(rowKey));
-        get.addColumn(Bytes.toBytes(familyName), Bytes.toBytes(columnName));
         Result result = htable.get(get);
-        return result;
+        Cell cell = result.getColumnLatestCell(Bytes.toBytes(familyName), Bytes.toBytes(columnName));
+        if (cell == null) {
+            return null;
+        }
+        return Bytes.toString(CellUtil.cloneValue(cell));
+    }
+
+    /**
+     * 根据Row的前缀获得value
+     *
+     * @param tableName
+     * @param rowPrefix
+     * @param familyName
+     * @param columnName
+     * @return
+     * @throws Exception
+     */
+    public List<String> getValueByRowPrefix(String tableName, String rowPrefix, String familyName, String columnName) throws Exception {
+        HTable htable = getHtable(tableName);
+        List<String> values = new ArrayList<>();
+
+        Scan scan = new Scan();
+        scan.setFilter(new PrefixFilter(Bytes.toBytes(rowPrefix)));
+        htable.getScanner(scan).forEach((result) -> {
+            Cell cell = result.getColumnLatestCell(Bytes.toBytes(familyName), Bytes.toBytes(columnName));
+            if (cell != null) {
+                values.add(Bytes.toString(CellUtil.cloneValue(cell)));
+            }
+        });
+        return values;
     }
 
 

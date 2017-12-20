@@ -41,6 +41,11 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>edu.hhu</groupId>
+            <artifactId>stonk-dao</artifactId>
+            <version>0.1</version>
+        </dependency>
 
 
     </dependencies>

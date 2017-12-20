@@ -12,6 +12,7 @@
         <module>stonk-manager</module>
         <module>stonk-spark</module>
         <module>stonk-utils</module>
+        <module>stonk-dao</module>
     </modules>
 
     <properties>

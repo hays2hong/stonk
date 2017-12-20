@@ -1,6 +1,4 @@
-package edu.hhu.stonk.manager.task;
-
-import edu.hhu.stonk.spark.task.TaskMLalgorithm;
+package edu.hhu.stonk.dao.task;
 
 /**
  * Stonk task info
@@ -17,7 +15,7 @@ public class StonkTaskInfo {
 
     private int sparkExecutorNum = 1;
 
-    private TaskMLalgorithm mlAlgorithm;
+    private SparkTaskAlgorithm sparkTaskAlgorithm;
 
 
     public StonkTaskType getTaskType() {
@@ -44,12 +42,12 @@ public class StonkTaskInfo {
         this.dataFile = dataFile;
     }
 
-    public TaskMLalgorithm getMlAlgorithm() {
-        return mlAlgorithm;
+    public SparkTaskAlgorithm getSparkTaskAlgorithm() {
+        return sparkTaskAlgorithm;
     }
 
-    public void setMlAlgorithm(TaskMLalgorithm mlAlgorithm) {
-        this.mlAlgorithm = mlAlgorithm;
+    public void setSparkTaskAlgorithm(SparkTaskAlgorithm sparkTaskAlgorithm) {
+        this.sparkTaskAlgorithm = sparkTaskAlgorithm;
     }
 
     public int getSparkExecutorNum() {

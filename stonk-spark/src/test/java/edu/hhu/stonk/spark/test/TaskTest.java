@@ -1,9 +1,9 @@
 package edu.hhu.stonk.spark.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.hhu.stonk.spark.datafile.DataFile;
-import edu.hhu.stonk.spark.datafile.DataFileType;
-import edu.hhu.stonk.spark.datafile.FieldInfo;
+import edu.hhu.stonk.dao.datafile.DataFile;
+import edu.hhu.stonk.dao.datafile.DataFileType;
+import edu.hhu.stonk.dao.datafile.FieldInfo;
 import edu.hhu.stonk.spark.task.SparkTaskInfo;
 import edu.hhu.stonk.spark.task.TaskMLalgorithm;
 

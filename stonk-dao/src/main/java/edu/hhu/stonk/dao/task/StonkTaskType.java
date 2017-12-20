@@ -1,4 +1,4 @@
-package edu.hhu.stonk.manager.task;
+package edu.hhu.stonk.dao.task;
 
 public enum StonkTaskType {
 

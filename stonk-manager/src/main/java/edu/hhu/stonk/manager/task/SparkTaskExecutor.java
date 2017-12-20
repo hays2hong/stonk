@@ -1,7 +1,7 @@
 package edu.hhu.stonk.manager.task;
 
+import edu.hhu.stonk.dao.datafile.DataFile;
 import edu.hhu.stonk.manager.conf.SystemConfig;
-import edu.hhu.stonk.spark.datafile.DataFile;
 import edu.hhu.stonk.spark.task.SparkTaskInfo;
 import edu.hhu.stonk.utils.RandomUtil;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package edu.hhu.stonk.spark.datafile;
+package edu.hhu.stonk.dao.datafile;
 
 public enum DataFileType {
     CSV("csv"),

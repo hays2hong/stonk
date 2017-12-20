@@ -1,4 +1,4 @@
-package edu.hhu.stonk.spark.task;
+package edu.hhu.stonk.dao.task;
 
 
 import java.io.Serializable;
@@ -9,11 +9,11 @@ import java.util.Map;
  *
  * @author hayes, @create 2017-12-11 20:05
  **/
-public class TaskMLalgorithm implements Serializable {
+public class SparkTaskAlgorithm implements Serializable {
 
     private static final long serialVersionUID = -2219671422459865122L;
     /**
-     * 算法名称，对应MLAlgorithmDesc中的name
+     * 算法名称，对应AlgorithmDesc中的name
      */
     private String name;
 

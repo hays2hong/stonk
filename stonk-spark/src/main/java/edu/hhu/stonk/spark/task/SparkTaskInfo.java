@@ -1,6 +1,7 @@
 package edu.hhu.stonk.spark.task;
 
-import edu.hhu.stonk.spark.datafile.DataFile;
+import edu.hhu.stonk.dao.datafile.DataFile;
+import edu.hhu.stonk.dao.task.SparkTaskAlgorithm;
 
 import java.io.Serializable;
 
@@ -35,7 +36,7 @@ public class SparkTaskInfo implements Serializable {
     /**
      * 算法信息
      */
-    private TaskMLalgorithm mlAlgorithm;
+    private SparkTaskAlgorithm mlAlgorithm;
 
     public String getName() {
         return name;
@@ -54,11 +55,11 @@ public class SparkTaskInfo implements Serializable {
         this.dataFile = dataFile;
     }
 
-    public TaskMLalgorithm getMlAlgorithm() {
+    public SparkTaskAlgorithm getMlAlgorithm() {
         return mlAlgorithm;
     }
 
-    public void setMlAlgorithm(TaskMLalgorithm mlAlgorithm) {
+    public void setMlAlgorithm(SparkTaskAlgorithm mlAlgorithm) {
         this.mlAlgorithm = mlAlgorithm;
     }
 
