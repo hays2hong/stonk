@@ -62,6 +62,6 @@
     </bean>
 
     <!-- 配置静态资源(JS、CSS、图片等)的访问路径 -->
-    <mvc:resources location="/plugin/" mapping="/plugin/**"/>
+    <mvc:resources location="/html/" mapping="/html/**"/>
 
 </beans>

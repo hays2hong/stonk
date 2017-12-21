@@ -5,6 +5,7 @@ import edu.hhu.stonk.dao.datafile.DataFileMapper;
 import edu.hhu.stonk.manager.common.ApiResult;
 import edu.hhu.stonk.manager.conf.SystemConfig;
 import edu.hhu.stonk.utils.HDFSClient;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Data File
@@ -23,9 +22,8 @@ import java.io.IOException;
  * @author hayes, @create 2017-12-20 18:55
  **/
 @Controller
+@RequestMapping(value = "/datafile")
 public class Datafile {
-
-    private static final String DATAFILE_TMP_FOLDER = "datafiletmp";
 
     private DataFileMapper dataFileMapper;
 
@@ -34,18 +32,16 @@ public class Datafile {
     @Autowired
     private SystemConfig systemConfig;
 
+
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody
     public ApiResult handleFileUpload(@RequestParam("uname") String uname,
-                                      @RequestParam("file") MultipartFile file) {
+                                      @RequestParam("file") MultipartFile file,
+                                      @RequestParam("dataFileDesc") String dataFileDesc) {
         try {
+            ObjectMapper mapper = new ObjectMapper();
+            DataFile dataFile = mapper.readValue(dataFileDesc.replaceAll("\\s+", ""), DataFile.class);
             String fileName = file.getOriginalFilename();
-            String tmpPath = DATAFILE_TMP_FOLDER + "/" + fileName;
-            byte[] bytes = file.getBytes();
-            BufferedOutputStream stream =
-                    new BufferedOutputStream(new FileOutputStream(new File(tmpPath)));
-            stream.write(bytes);
-            stream.close();
             String hdfsPath = new StringBuilder()
                     .append(systemConfig.getHdfsMaster())
                     .append("/stonk/spark/")
@@ -53,8 +49,12 @@ public class Datafile {
                     .append("/datafile/")
                     .append(fileName)
                     .toString();
-            boolean r = hdfsClient.uploadFromLocal(tmpPath, hdfsPath, true);
+            boolean r = hdfsClient.uploadFromBytes(file.getBytes(), hdfsPath, true);
             if (r) {
+                dataFile.setName(fileName);
+                dataFile.setPath(hdfsPath);
+                dataFile.setUname(uname);
+                dataFileMapper.put(dataFile);
                 return ApiResult.buildSucess();
             } else {
                 return ApiResult.buildFail("上传失败");
@@ -64,9 +64,9 @@ public class Datafile {
         }
     }
 
-    @RequestMapping(value = "/desc", method = RequestMethod.POST)
+    @RequestMapping(value = "/changedesc", method = RequestMethod.POST)
     @ResponseBody
-    public ApiResult desc(@RequestBody DataFile dataFile) {
+    public ApiResult changeDesc(@RequestBody DataFile dataFile) {
         try {
             dataFileMapper.put(dataFile);
             return ApiResult.buildSucess();
@@ -75,14 +75,27 @@ public class Datafile {
         }
     }
 
+    @RequestMapping(value = "/{uname}", method = RequestMethod.GET)
+    @ResponseBody
+    public ApiResult getAll(@PathVariable String uname) {
+        try {
+            List<DataFile> dataFiles = dataFileMapper.get(uname);
+            return ApiResult.buildSucessWithData(dataFiles);
+        } catch (Exception e) {
+            return ApiResult.buildFail(e.getMessage());
+        }
+    }
+
     @PostConstruct
     public void init() throws Exception {
+        dataFileMapper = new DataFileMapper();
         hdfsClient = new HDFSClient(systemConfig.getHdfsMaster());
     }
 
     @PreDestroy
     public void destroy() throws IOException {
         hdfsClient.close();
+        dataFileMapper.close();
     }
 
 }

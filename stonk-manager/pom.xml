@@ -16,6 +16,17 @@
     <dependencies>
 
         <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-io</artifactId>
+                    <groupId>commons-io</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
             <groupId>edu.hhu</groupId>
             <artifactId>stonk-dao</artifactId>
             <version>0.1</version>
@@ -37,10 +48,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>javax.servlet</groupId>

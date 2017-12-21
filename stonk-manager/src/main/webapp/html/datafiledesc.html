@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Datafile Desc</title>
+</head>
+<body>
+<div>
+    <input type="text" name="desc-json" id="desc-json"/><br/><br/>
+    <input type="button" name="submit" onclick="submit"/>
+</div>
+
+<script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+    function submit() {
+        $.ajax({
+            type: 'POST',
+            url: '../datafile/desc',
+            data: {dataFile: $("#desc-json").val()},
+            dataType: 'json', //返回值类型 一般设置为json
+            success: function (r) {
+                if (r.sucess) {
+                    alert("成功");
+                } else {
+                    alert("失败:" + r.errMsg);
+                }
+            }
+        });
+    }
+</script>
+</body>
+
+</html>

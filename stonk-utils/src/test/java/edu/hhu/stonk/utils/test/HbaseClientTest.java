@@ -34,9 +34,9 @@ public class HbaseClientTest {
 
     @Test
     public void testCreateTable() throws Exception {
-        client.createTable("stonk-user", new String[]{"info"});
+        //client.createTable("stonk-user", new String[]{"info"});
         client.createTable("stonk-datafile", new String[]{"info"});
-        client.createTable("stonk-task", new String[]{"info"});
+        //client.createTable("stonk-task", new String[]{"info"});
     }
 
     @Test

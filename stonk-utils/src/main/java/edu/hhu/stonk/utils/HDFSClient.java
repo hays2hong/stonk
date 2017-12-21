@@ -2,10 +2,7 @@ package edu.hhu.stonk.utils;
 
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocatedFileStatus;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 
@@ -106,6 +103,30 @@ public class HDFSClient implements Closeable {
         } catch (IOException e) {
             e.printStackTrace();
             return false;
+        }
+        return true;
+    }
+
+    /**
+     * @param data
+     * @param dst
+     * @param overwrite
+     * @return
+     */
+    public boolean uploadFromBytes(byte[] data, String dst, boolean overwrite) {
+        FSDataOutputStream outputStream = null;
+        try {
+            outputStream = fs.create(new Path(dst), overwrite);
+            outputStream.write(data);
+            outputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+            }
         }
         return true;
     }

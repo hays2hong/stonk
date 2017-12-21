@@ -11,7 +11,7 @@ import java.util.Properties;
  **/
 public class HbaseConfig {
 
-    private static final String CONF_FILE_PATH = "/hbase-hbase-conf.conf";
+    private static final String CONF_FILE_PATH = "/hbase-conf.conf";
 
     private static String hbaseRootdir;
 
