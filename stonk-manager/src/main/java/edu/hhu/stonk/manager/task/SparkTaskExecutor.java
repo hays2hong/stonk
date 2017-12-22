@@ -6,6 +6,7 @@ import edu.hhu.stonk.utils.RandomUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,7 @@ public class SparkTaskExecutor {
         fillStonkTaskInfo(taskInfo);
 
         ProcessBuilder pb = new ProcessBuilder();
+        pb.directory(new File("/root/spark-k8s/spark-k8s/bin"));
         pb.command(buildCommand(taskInfo));
         Process p = pb.start();
     }
@@ -50,11 +52,13 @@ public class SparkTaskExecutor {
 
     public List<String> buildCommand(StonkTaskInfo taskInfo) {
         List<String> command = new ArrayList<>();
-        command.add("bin/spark-submit");
+        command.add("./spark-submit");
         command.add("--deploy-mode");
         command.add("cluster");
         command.add("--master");
         command.add(systemConfig.getK8sMaster());
+        command.add("--class");
+        command.add("edu.hhu.stonk.spark.Submiter");
         command.add("--kubernetes-namespace");
         command.add(systemConfig.getK8sSparkNamespace());
         command.add("--conf");

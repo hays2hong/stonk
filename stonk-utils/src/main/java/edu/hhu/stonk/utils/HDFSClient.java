@@ -3,12 +3,11 @@ package edu.hhu.stonk.utils;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.apache.hadoop.hdfs.protocol.DatanodeInfo;
 
-import java.io.Closeable;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +15,8 @@ import java.util.List;
 
 public class HDFSClient implements Closeable {
     private FileSystem fs;
+
+    private static final String BLOCK_SIZE = String.valueOf(16 * 1024 * 1024);
 
     /***
      * @param user 传入需要连接的用户
@@ -37,6 +38,7 @@ public class HDFSClient implements Closeable {
         Configuration configuration = new Configuration();
         //HDFS 的地址需要修改成自己的地址
         configuration.set("fs.default.name", HdfsUri);
+        configuration.set("dfs.block.size", BLOCK_SIZE);
         //设定文件系统的URI, 配置, 以及用户
         fs = FileSystem.get(new URI(HdfsUri), configuration, "root");
     }
@@ -138,15 +140,48 @@ public class HDFSClient implements Closeable {
      * @param dst
      * @return
      */
-    public boolean getFromHDFS(String src, String dst) {
-        Path dstPath = new Path(dst);
+    public boolean download(String src, String dst) {
         try {
-            fs.copyToLocalFile(false, new Path(src), dstPath);
+            fs.copyToLocalFile(false, new Path(src), new Path(dst));
         } catch (IOException ie) {
             ie.printStackTrace();
             return false;
         }
         return true;
+    }
+
+    /**
+     * 文件下载
+     *
+     * @param src
+     * @param dst
+     * @return
+     */
+    public boolean downloadByStream(String src, String dst) {
+        FSDataInputStream inputStream = null;
+        FileOutputStream outputStream = null;
+        try {
+            inputStream = fs.open(new Path(src));
+            outputStream = new FileOutputStream(new File(dst));
+
+            byte[] tmp = new byte[10240];
+            int length = 0;
+            while ((length = inputStream.read(tmp)) != -1) {
+                outputStream.write(tmp, 0, length);
+            }
+            outputStream.flush();
+            return true;
+        } catch (IOException ie) {
+            ie.printStackTrace();
+            return false;
+        } finally {
+            try {
+                inputStream.close();
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public DataInputStream getFileInputStream(String src) throws IOException {

@@ -30,7 +30,7 @@ public class Task {
 
 
     //TODO：提交任务后，任务的管理
-    @RequestMapping(value = "/submit", method = RequestMethod.PUT)
+    @RequestMapping(value = "/submit", method = RequestMethod.POST)
     @ResponseBody
     public ApiResult<String> submit(@RequestBody StonkTaskInfo taskInfo) {
         if (taskInfo.getTaskType() == StonkTaskType.SPARK_TASK_TYPE) {
@@ -46,7 +46,7 @@ public class Task {
         return ApiResult.buildFail("不支持的任务类型");
     }
 
-    @RequestMapping(value = "/{uname}/tasks", method = RequestMethod.GET)
+    @RequestMapping(value = "/{uname}", method = RequestMethod.GET)
     @ResponseBody
     public ApiResult<List<StonkTaskInfo>> tasks(@PathVariable String uname) {
         try {
@@ -56,7 +56,7 @@ public class Task {
         }
     }
 
-    @RequestMapping(value = "/{uname}/tasks/{taskName}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{uname}/{taskName}", method = RequestMethod.GET)
     @ResponseBody
     public ApiResult<List<StonkTaskInfo>> task(@PathVariable String uname, @PathVariable String taskName) {
         try {

@@ -6,8 +6,9 @@
 </head>
 <body>
 <div>
-    <input type="text" name="desc-json" id="desc-json"/><br/><br/>
-    <input type="button" name="submit" onclick="submit"/>
+    <h2>提交任务</h2>
+    <textarea name="task-json" id="task-json" cols="50" rows="30"></textarea>
+    <input type="button" name="submit" onclick="submit()" value="submit"/>
 </div>
 
 <script src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
@@ -15,9 +16,11 @@
     function submit() {
         $.ajax({
             type: 'POST',
-            url: '../datafile/desc',
-            data: {dataFile: $("#desc-json").val()},
-            dataType: 'json', //返回值类型 一般设置为json
+            url: '../task/submit',
+            data: $("#task-json").val(),
+            contentType: 'application/json',
+            processData: false,
+            dataType: 'json', //返回值类型
             success: function (r) {
                 if (r.sucess) {
                     alert("成功");

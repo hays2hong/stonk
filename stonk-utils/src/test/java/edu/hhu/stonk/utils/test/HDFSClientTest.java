@@ -57,4 +57,11 @@ public class HDFSClientTest {
         client.uploadFromLocal("D://test/ngram/testtask.json", "hdfs://10.196.83.90:9000/stonk/spark/1001/test/testtask.json");
         // client.uploadFromLocal("D://test/ngram/testdata.csv", "hdfs://10.196.83.90:9000/stonk/spark/1001/test/testdata.csv");
     }
+
+    @Test
+    public void testDownload() {
+        String hdfsPath = "hdfs://10.196.83.90:9000/stonk/spark/aa/spark-task--aa-b5x59zpv/out17";
+        String downloadPath = "D://test/download";
+        client.download(hdfsPath, downloadPath);
+    }
 }

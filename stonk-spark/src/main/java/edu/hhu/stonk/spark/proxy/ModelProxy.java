@@ -3,6 +3,9 @@ package edu.hhu.stonk.spark.proxy;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
  * 训练后的模型代理
  *
@@ -22,15 +25,30 @@ public class ModelProxy {
         this.modelClazz = modelClazz;
     }
 
-    public static ModelProxy load(String path) {
-        return null;
+    private ModelProxy() {
     }
 
-    public Dataset<Row> tranform(Dataset<Row> dataset) {
-        return null;
+    /**
+     * TODO： 加载
+     *
+     * @param path
+     * @param modelClazz
+     * @return
+     */
+    public static ModelProxy load(String path, Class modelClazz) {
+        ModelProxy modelProxy = new ModelProxy();
+        modelProxy.modelClazz = modelClazz;
+
+        return modelProxy;
     }
 
-    public void save(String path) {
+    public Dataset<Row> tranform(Dataset<Row> dataset) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method method = modelClazz.getMethod("save", Dataset.class);
+        return (Dataset<Row>) method.invoke(model, dataset);
+    }
 
+    public void save(String path) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method method = modelClazz.getMethod("save", String.class);
+        method.invoke(model,path);
     }
 }

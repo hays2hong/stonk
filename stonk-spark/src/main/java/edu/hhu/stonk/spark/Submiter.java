@@ -2,6 +2,7 @@ package edu.hhu.stonk.spark;
 
 import edu.hhu.stonk.dao.task.StonkTaskInfo;
 import edu.hhu.stonk.dao.task.StonkTaskMapper;
+import edu.hhu.stonk.spark.datafile.PersistDataset;
 import edu.hhu.stonk.spark.datafile.SparkDataFileConverter;
 import edu.hhu.stonk.spark.mllib.ComponentType;
 import edu.hhu.stonk.spark.mllib.MLAlgorithmDesc;
@@ -9,6 +10,7 @@ import edu.hhu.stonk.spark.mllib.MLAlgorithmLoader;
 import edu.hhu.stonk.spark.proxy.EstimatorProxy;
 import edu.hhu.stonk.spark.proxy.ModelProxy;
 import edu.hhu.stonk.spark.proxy.TransformerProxy;
+import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -21,10 +23,7 @@ import org.apache.spark.sql.SparkSession;
  **/
 public class Submiter {
 
-    /**
-     * spark master
-     */
-    private static String masterUrl;
+    private static boolean testMode = true;
 
     /**
      * hdfs host地址
@@ -44,27 +43,48 @@ public class Submiter {
     public static void main(String[] args) throws Exception {
         //加载配置
         loadArgs(args);
-
-        //JavaSparkContext初始化
-        SparkSession sparkSession = SparkSession
-                .builder()
-                .appName(taskInfo.getName())
-                .getOrCreate();
-        JavaSparkContext context = new JavaSparkContext(sparkSession.sparkContext());
+        //生成Context
+        JavaSparkContext context = buildJavaSparkContext();
 
         Dataset<Row> dataset = SparkDataFileConverter.extractDataFrame(taskInfo, context);
         String mlAlgoName = taskInfo.getSparkTaskAlgorithm().getName();
         MLAlgorithmDesc mlAlgoDesc = MLAlgorithmLoader.getMLAlgorithmDesc(mlAlgoName);
 
         if (mlAlgoDesc.getComponentsType() == ComponentType.ESTIMATOR) {
-            EstimatorProxy estimatorProxy = new EstimatorProxy(taskInfo.getSparkTaskAlgorithm());
-            ModelProxy modelProxy = estimatorProxy.fit(dataset);
+            excuteEstimator(taskInfo, dataset);
         } else if (mlAlgoDesc.getComponentsType() == ComponentType.TRANSFORMER) {
-            TransformerProxy transformerProxy = new TransformerProxy(taskInfo.getSparkTaskAlgorithm());
-            Dataset<Row> transformedDataset = transformerProxy.transform(dataset);
-            transformedDataset.write()
-                    .json(hdfsFilePrefix + "/out16");
+            excuteTransformer(taskInfo, dataset);
         }
+    }
+
+    private static void excuteEstimator(StonkTaskInfo taskInfo,
+                                        Dataset<Row> dataset) throws Exception {
+        EstimatorProxy estimatorProxy = new EstimatorProxy(taskInfo.getSparkTaskAlgorithm());
+        ModelProxy modelProxy = estimatorProxy.fit(dataset);
+        modelProxy.save(hdfsFilePrefix + "/model");
+    }
+
+    private static void excuteTransformer(StonkTaskInfo taskInfo,
+                                          Dataset<Row> dataset) throws Exception {
+
+        TransformerProxy transformerProxy = new TransformerProxy(taskInfo.getSparkTaskAlgorithm());
+        Dataset<Row> transformedDataset = transformerProxy.transform(dataset);
+        PersistDataset.persist(transformedDataset, hdfsFilePrefix + "/out3");
+    }
+
+
+    private static JavaSparkContext buildJavaSparkContext() {
+        //本地模式
+        if (testMode) {
+            SparkConf conf = new SparkConf().setAppName(taskInfo.getName()).setMaster("local[3]");
+            return new JavaSparkContext(conf);
+        }
+        //JavaSparkContext初始化
+        SparkSession sparkSession = SparkSession
+                .builder()
+                .appName(taskInfo.getName())
+                .getOrCreate();
+        return new JavaSparkContext(sparkSession.sparkContext());
     }
 
     private static void loadArgs(String[] args) throws Exception {

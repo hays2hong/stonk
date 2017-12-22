@@ -86,6 +86,17 @@ public class Datafile {
         }
     }
 
+    @RequestMapping(value = "/{uname}/{dataFileName}", method = RequestMethod.GET)
+    @ResponseBody
+    public ApiResult getDataFileDesc(@PathVariable String uname, @PathVariable String dataFileName) {
+        try {
+            DataFile dataFile = dataFileMapper.get(uname, dataFileName);
+            return ApiResult.buildSucessWithData(dataFile);
+        } catch (Exception e) {
+            return ApiResult.buildFail(e.getMessage());
+        }
+    }
+
     @PostConstruct
     public void init() throws Exception {
         dataFileMapper = new DataFileMapper();
