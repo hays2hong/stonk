@@ -1,7 +1,6 @@
 #!/bin/sh
 
-git clone https://github.com/hays2hong/stonk.git
-cd stonk
+cd ..
 mvn clean package install -DskipTests
 
 IMAGE_VERSION="0.1"
