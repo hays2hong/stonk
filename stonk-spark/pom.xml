@@ -48,6 +48,7 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
@@ -57,16 +58,25 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
                 <executions>
                     <execution><!-- 配置执行器 -->
                         <id>make-assembly</id>
-                        <phase>package</phase><!-- 绑定到package生命周期阶段上 -->
+                        <phase>install</phase><!-- 绑定到package生命周期阶段上 -->
                         <goals>
-                            <goal>single</goal><!-- 只运行一次 -->
+                            <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>${project.name}</finalName>
-                            <descriptor>src/main/resources/assembly/assembly.xml</descriptor><!--配置描述文件路径-->
+                            <archive>
+                                <manifest>
+                                    <!--<addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>-->
+                                    <mainClass>edu.hhu.stonk.spark.Submiter</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptors>
+                                <descriptor>src/main/resources/assembly/assembly.xml</descriptor><!--配置描述文件路径-->
+                            </descriptors>
                         </configuration>
                     </execution>
                 </executions>

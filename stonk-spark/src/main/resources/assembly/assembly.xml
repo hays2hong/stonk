@@ -1,5 +1,5 @@
 <assembly>
-    <id>1</id>
+    <id>assembly</id>
     <formats>
         <format>jar</format><!--打包的文件格式,也可以有：war zip-->
     </formats>
@@ -7,14 +7,22 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <dependencySets>
         <dependencySet>
+            <unpack>true</unpack>
             <!--是否把本项目添加到依赖文件夹下-->
             <useProjectArtifact>true</useProjectArtifact>
-            <outputDirectory>lib</outputDirectory>
+            <outputDirectory>/</outputDirectory>
             <!--将scope为runtime的依赖包打包-->
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>
-    <moduleSets>
+    <!--<fileSets>
+        <fileSet>
+            <directory>target/classes</directory>
+            <outputDirectory>./</outputDirectory>
+
+        </fileSet>
+    </fileSets>-->
+    <!--<moduleSets>
         <moduleSet>
             <useAllReactorProjects>true</useAllReactorProjects>
             <includeSubModules>true</includeSubModules>
@@ -23,10 +31,10 @@
                 <include>edu.hhu:stonk-utils</include>
             </includes>
             <binaries>
-                <outputDirectory>assembly</outputDirectory>
+                <outputDirectory>modules/maven-assembly-plugin</outputDirectory>
                 <unpack>false</unpack>
             </binaries>
         </moduleSet>
-    </moduleSets>
+    </moduleSets>-->
 
 </assembly>

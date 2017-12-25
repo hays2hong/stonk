@@ -26,6 +26,12 @@ public class HDFSClient implements Closeable {
         Configuration configuration = new Configuration();
         //HDFS 的地址需要修改成自己的地址
         configuration.set("fs.default.name", HdfsUri);
+//        configuration.set("fs.hdfs.impl",
+//                org.apache.hadoop.hdfs.DistributedFileSystem.class.getName()
+//        );
+//        configuration.set("fs.file.impl",
+//                org.apache.hadoop.fs.LocalFileSystem.class.getName()
+//        );
         // 设定文件系统的URI, 配置, 以及用户
         fs = FileSystem.get(new URI(HdfsUri), configuration, user);
     }

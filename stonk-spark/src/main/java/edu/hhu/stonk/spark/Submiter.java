@@ -10,6 +10,7 @@ import edu.hhu.stonk.spark.mllib.MLAlgorithmLoader;
 import edu.hhu.stonk.spark.proxy.EstimatorProxy;
 import edu.hhu.stonk.spark.proxy.ModelProxy;
 import edu.hhu.stonk.spark.proxy.TransformerProxy;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
@@ -69,22 +70,30 @@ public class Submiter {
 
         TransformerProxy transformerProxy = new TransformerProxy(taskInfo.getSparkTaskAlgorithm());
         Dataset<Row> transformedDataset = transformerProxy.transform(dataset);
-        PersistDataset.persist(transformedDataset, hdfsFilePrefix + "/out3");
+        PersistDataset.persist(transformedDataset, hdfsFilePrefix + "out110");
     }
 
 
     private static JavaSparkContext buildJavaSparkContext() {
+        JavaSparkContext context = null;
         //本地模式
         if (testMode) {
             SparkConf conf = new SparkConf().setAppName(taskInfo.getName()).setMaster("local[3]");
-            return new JavaSparkContext(conf);
+            context = new JavaSparkContext(conf);
+        } else {
+            //JavaSparkContext初始化
+            SparkSession sparkSession = SparkSession
+                    .builder()
+                    .appName(taskInfo.getName())
+                    .getOrCreate();
+            context = new JavaSparkContext(sparkSession.sparkContext());
         }
-        //JavaSparkContext初始化
-        SparkSession sparkSession = SparkSession
-                .builder()
-                .appName(taskInfo.getName())
-                .getOrCreate();
-        return new JavaSparkContext(sparkSession.sparkContext());
+        Configuration hadoopConf = context.hadoopConfiguration();
+        hadoopConf.set("fs.hdfs.impl",
+                org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+        hadoopConf.set("fs.file.impl",
+                org.apache.hadoop.fs.LocalFileSystem.class.getName());
+        return context;
     }
 
     private static void loadArgs(String[] args) throws Exception {
