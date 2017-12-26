@@ -10,6 +10,7 @@ import edu.hhu.stonk.spark.mllib.MLAlgorithmLoader;
 import edu.hhu.stonk.spark.proxy.EstimatorProxy;
 import edu.hhu.stonk.spark.proxy.ModelProxy;
 import edu.hhu.stonk.spark.proxy.TransformerProxy;
+import edu.hhu.stonk.utils.RandomUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -24,7 +25,7 @@ import org.apache.spark.sql.SparkSession;
  **/
 public class Submiter {
 
-    private static boolean testMode = true;
+    private static boolean testMode = false;
 
     /**
      * hdfs host地址
@@ -70,7 +71,7 @@ public class Submiter {
 
         TransformerProxy transformerProxy = new TransformerProxy(taskInfo.getSparkTaskAlgorithm());
         Dataset<Row> transformedDataset = transformerProxy.transform(dataset);
-        PersistDataset.persist(transformedDataset, hdfsFilePrefix + "out110");
+        PersistDataset.persist(transformedDataset, hdfsFilePrefix + "out-" + RandomUtil.getRandomString(5));
     }
 
 

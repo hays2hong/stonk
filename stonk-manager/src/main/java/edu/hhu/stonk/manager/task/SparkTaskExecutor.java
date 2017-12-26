@@ -2,12 +2,13 @@ package edu.hhu.stonk.manager.task;
 
 import edu.hhu.stonk.dao.task.StonkTaskInfo;
 import edu.hhu.stonk.manager.conf.SystemConfig;
-import edu.hhu.stonk.utils.RandomUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
 @Component
 public class SparkTaskExecutor {
 
-    private static final String TASK_PREFIX = "spark-task-";
+
 
     @Autowired
     SystemConfig systemConfig;
@@ -33,22 +34,17 @@ public class SparkTaskExecutor {
      * @throws IOException
      */
     public void execute(StonkTaskInfo taskInfo) throws IOException {
-        fillStonkTaskInfo(taskInfo);
-
         ProcessBuilder pb = new ProcessBuilder();
-        pb.directory(new File("/root/spark-k8s/spark-k8s/bin"));
+        pb.directory(new File(systemConfig.getSparkK8sDir()));
         pb.command(buildCommand(taskInfo));
         Process p = pb.start();
+        LineNumberReader reader = new LineNumberReader(new InputStreamReader(p.getInputStream()));
+        String line = null;
+        if ((line = reader.readLine()) != null) {
+            System.out.println(line);
+        }
     }
 
-    private void fillStonkTaskInfo(StonkTaskInfo taskInfo) {
-        String taskName = new StringBuilder().append(TASK_PREFIX)
-                .append("-").append(taskInfo.getUname())
-                .append("-").append(RandomUtil.getRandomString(8))
-                .toString();
-        taskInfo.setName(taskName);
-        taskInfo.setTimeStamp(System.currentTimeMillis());
-    }
 
     public List<String> buildCommand(StonkTaskInfo taskInfo) {
         List<String> command = new ArrayList<>();

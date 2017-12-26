@@ -1,5 +1,6 @@
 package edu.hhu.stonk.utils;
 
+import io.leopard.javahost.JavaHost;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
@@ -8,9 +9,11 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -19,6 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author hayes, @create 2017-12-19 16:18
  **/
 public class HbaseClient implements Closeable {
+
+    private static String HOSTS_CONF_PATH = "/hosts.conf";
 
     Configuration hbaseConf = null;
 
@@ -30,6 +35,7 @@ public class HbaseClient implements Closeable {
 
     //TODO: 连接池和用户相关设置
     public HbaseClient(String zkMaster, String zkClientPort, String rootDir, String retryNum) throws IOException {
+        addHosts();
         hbaseConf = HBaseConfiguration.create();
         hbaseConf.set("hbase.zookeeper.property.clientPort", zkClientPort);
         hbaseConf.set("hbase.zookeeper.quorum", zkMaster);
@@ -39,6 +45,13 @@ public class HbaseClient implements Closeable {
         admin = connection.getAdmin();
     }
 
+    public static void addHosts() throws IOException {
+        InputStream in = HbaseClient.class.getResourceAsStream(HOSTS_CONF_PATH);
+        Properties pro = new Properties();
+        pro.load(in);
+        JavaHost.updateVirtualDns(pro);
+        in.close();
+    }
 
     /**
      * 创建表

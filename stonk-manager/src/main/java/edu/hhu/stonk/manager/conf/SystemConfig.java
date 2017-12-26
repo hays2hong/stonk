@@ -32,6 +32,8 @@ public class SystemConfig {
 
     private String taskJarPath;
 
+    private String sparkK8sDir;
+
 
     @PostConstruct
     public void load() throws IOException {
@@ -45,6 +47,7 @@ public class SystemConfig {
         k8sSparkExecutorDockerImage = pro.getProperty("k8s.spark.executor.docker.image");
         hdfsMaster = pro.getProperty("hdfs.master");
         taskJarPath = pro.getProperty("task.jar.path");
+        sparkK8sDir = pro.getProperty("spark-k8s.dir");
     }
 
 
@@ -76,4 +79,11 @@ public class SystemConfig {
         return taskJarPath;
     }
 
+    public String getSparkK8sDir() {
+        return sparkK8sDir;
+    }
+
+    public void setSparkK8sDir(String sparkK8sDir) {
+        this.sparkK8sDir = sparkK8sDir;
+    }
 }

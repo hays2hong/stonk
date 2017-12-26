@@ -5,6 +5,7 @@ import edu.hhu.stonk.dao.task.StonkTaskMapper;
 import edu.hhu.stonk.dao.task.StonkTaskType;
 import edu.hhu.stonk.manager.common.ApiResult;
 import edu.hhu.stonk.manager.task.TaskManager;
+import edu.hhu.stonk.utils.RandomUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,8 @@ import java.util.List;
 @RequestMapping("/task")
 public class Task {
 
+    private static final String SPARK_TASK_PREFIX = "spark-task";
+
     @Autowired
     private TaskManager taskManager;
 
@@ -35,8 +38,9 @@ public class Task {
     public ApiResult<String> submit(@RequestBody StonkTaskInfo taskInfo) {
         if (taskInfo.getTaskType() == StonkTaskType.SPARK_TASK_TYPE) {
             try {
-                taskManager.execute(taskInfo);
+                fillSparkTaskInfo(taskInfo);
                 taskMapper.put(taskInfo);
+                taskManager.execute(taskInfo);
                 return ApiResult.buildSucessWithData(taskInfo);
             } catch (Exception e) {
                 return ApiResult.buildFail(e.getMessage());
@@ -44,6 +48,15 @@ public class Task {
         }
 
         return ApiResult.buildFail("不支持的任务类型");
+    }
+
+    private void fillSparkTaskInfo(StonkTaskInfo taskInfo) {
+        String taskName = new StringBuilder().append(SPARK_TASK_PREFIX)
+                .append("-").append(taskInfo.getUname())
+                .append("-").append(RandomUtil.getRandomString(8))
+                .toString();
+        taskInfo.setName(taskName);
+        taskInfo.setTimeStamp(System.currentTimeMillis());
     }
 
     @RequestMapping(value = "/{uname}", method = RequestMethod.GET)
