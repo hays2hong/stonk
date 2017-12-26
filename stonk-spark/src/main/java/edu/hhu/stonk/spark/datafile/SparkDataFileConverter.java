@@ -30,7 +30,7 @@ public class SparkDataFileConverter {
     }
 
     /**
-     * 将数据集文件转换为DataFrame
+     * 将数据集文件转换为DataFrame  TODO:增加json等格式
      *
      * @param context
      * @return
