@@ -7,6 +7,7 @@ import java.util.Properties;
 /**
  * Hbase Config
  *
+ *
  * @author hayes, @create 2017-12-20 16:59
  **/
 public class HbaseConfig {
